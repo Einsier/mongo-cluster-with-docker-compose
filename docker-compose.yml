@@ -1,0 +1,85 @@
+version: '2'
+services:
+  rs_config_server:
+    image: mongo:4.2.7
+    command: --config /etc/mongo/mongod.conf --configsvr --replSet "rs-config-server" --bind_ip_all
+    volumes:
+      - /data/mongodb/conf/config:/etc/mongo
+      - /data/mongodb/conf/db:/data/db
+      - /data/mongodb/security:/etc/security
+    ports:
+      - "10021:27019"
+    networks:
+      - mongodbs
+    restart:
+      always
+    container_name:
+      rs_config_server
+    ulimits:
+      nofile:
+        soft: 300000
+        hard: 300000
+
+  rs_shard_server1:
+    image: mongo:4.2.7
+    command: --config /etc/mongo/mongod.conf --directoryperdb --shardsvr --replSet "rs-shard1-server" --bind_ip_all
+    volumes:
+      - /data/mongodb/shard1/config:/etc/mongo
+      - /data/mongodb/shard1/db:/data/db
+      - /data/mongodb/security:/etc/security
+    ports:
+      - "10031:27018"
+    networks:
+      - mongodbs
+    restart:
+      always
+    container_name:
+      rs_shard1_server
+    ulimits:
+      nofile:
+        soft: 300000
+        hard: 300000
+
+  rs_shard_server2:
+    image: mongo:4.2.7
+    command: --config /etc/mongo/mongod.conf --directoryperdb --shardsvr --replSet "rs-shard2-server" --bind_ip_all
+    volumes:
+      - /data/mongodb/shard2/config:/etc/mongo
+      - /data/mongodb/shard2/db:/data/db
+      - /data/mongodb/security:/etc/security
+    ports:
+      - "10041:27018"
+    networks:
+      - mongodbs
+    restart:
+      always
+    container_name:
+      rs_shard2_server
+    ulimits:
+      nofile:
+        soft: 300000
+        hard: 300000
+
+  rs_mongos_server:
+    image: mongo:4.2.7
+    command: mongos --config /etc/mongo/mongos.conf --configdb rs-config-server/<your_host_ip_1>:10021,<your_host_ip_2>:10021,<your_host_ip_3>:10021 --bind_ip_all
+    ports:
+      - "10011:27017"
+    networks:
+      - mongodbs
+    volumes:
+      - /data/mongodb/mongos/config:/etc/mongo
+      - /data/mongodb/security:/etc/security
+    restart:
+      always
+    container_name:
+      rs_mongos_server
+    ulimits:
+      nofile:
+        soft: 300000
+        hard: 300000
+
+# 跨主机网络
+networks:
+  mongodbs:
+    external: true
