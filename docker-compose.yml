@@ -20,7 +20,7 @@ services:
         soft: 300000
         hard: 300000
 
-  rs_shard_server1:
+  rs_shard1_server:
     image: mongo:4.2.7
     command: --config /etc/mongo/mongod.conf --directoryperdb --shardsvr --replSet "rs-shard1-server" --bind_ip_all
     volumes:
@@ -40,7 +40,7 @@ services:
         soft: 300000
         hard: 300000
 
-  rs_shard_server2:
+  rs_shard2_server:
     image: mongo:4.2.7
     command: --config /etc/mongo/mongod.conf --directoryperdb --shardsvr --replSet "rs-shard2-server" --bind_ip_all
     volumes:
